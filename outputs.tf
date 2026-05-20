@@ -51,7 +51,7 @@ output "instructions" {
 output "github_actions_setup" {
   description = "Commands to configure GitHub Actions variables using GitHub CLI (gh)"
   value = var.enable_github_wif ? format(
-    "\n-----------------------------------------------------------\nGITHUB ACTIONS SETUP:\n\nCopy cicd_github_action.yaml to your Terraform projects and\nrun GitHub CLI (gh) commands in your target repositories:\n\ngh variable set GCP_PROJECT_ID --body \"%s\"\ngh variable set GCP_WIF_PROVIDER --body \"%s\"\ngh variable set GCP_WIF_SERVICE_ACCOUNT --body \"%s\"\n-----------------------------------------------------------\n",
+    "\n-----------------------------------------------------------\nGITHUB ACTIONS SETUP:\n\nCopy cicd_github_action.yaml to your Terraform projects and\nrun GitHub CLI (gh) commands in your target repositories\n(or define these variables directly at github.com):\n\ngh variable set GCP_PROJECT_ID --body \"%s\"\ngh variable set GCP_WIF_PROVIDER --body \"%s\"\ngh variable set GCP_WIF_SERVICE_ACCOUNT --body \"%s\"\n-----------------------------------------------------------\n",
     var.project_id,
     module.iam_wif.workload_identity_provider,
     module.iam_wif.admin_service_account_email
