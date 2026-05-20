@@ -1,0 +1,27 @@
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 6.0"
+    }
+    time = {
+      source  = "hashicorp/time"
+      version = "~> 0.14"
+    }
+  }
+
+  # AFTER the first 'terraform apply', uncomment this block
+  # and run 'terraform init' to migrate state to the cloud.
+
+  # backend "gcs" {
+  #   bucket = "REPLACE_WITH_BUCKET_NAME_FROM_OUTPUT"
+  #   prefix = "terraform/bootstrap/state"
+  # }
+}
+
+provider "google" {
+  project = var.project_id
+  region  = var.region
+  zone    = var.zone
+}

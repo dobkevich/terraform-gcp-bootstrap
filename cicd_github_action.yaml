@@ -1,0 +1,33 @@
+# Example GitHub Action Workflow using WIF (Bootstrap)
+name: Terraform Plan/Apply
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v2'
+        with:
+          # Use the 'workload_identity_provider' output from your bootstrap process
+          workload_identity_provider: 'projects/YOUR_PROJECT_NUMBER/locations/global/workloadIdentityPools/cicd-pool/providers/github-provider'
+          service_account: 'project-admin-sa@YOUR_PROJECT_ID.iam.gserviceaccount.com'
+
+      - name: 'Set up Cloud SDK'
+        uses: 'google-github-actions/setup-gcloud@v2'
+
+      - name: 'Terraform Init'
+        run: terraform init
+
+      - name: 'Terraform Plan'
+        run: terraform plan
