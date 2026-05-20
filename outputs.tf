@@ -15,16 +15,6 @@ output "admin_service_account_email" {
   value = module.iam_wif.admin_service_account_email
 }
 
-output "github_actions_setup" {
-  description = "Commands to configure GitHub Actions variables using GitHub CLI (gh)"
-  value       = var.enable_github_wif ? <<-EOT
-    # Run these commands in your target GitHub repository:
-    gh variable set GCP_PROJECT_ID --body "${var.project_id}"
-    gh variable set GCP_WIF_PROVIDER --body "${module.iam_wif.workload_identity_provider}"
-    gh variable set GCP_WIF_SERVICE_ACCOUNT --body "${module.iam_wif.admin_service_account_email}"
-  EOT : "GitHub WIF is not enabled. Set enable_github_wif = true to see setup commands."
-}
-
 output "instructions" {
   value = <<-EOT
     1. Human Admin (${var.admin_email}) has 'Editor', 'Project IAM Admin' and 'Billing Project Manager' roles.
@@ -48,16 +38,22 @@ output "instructions" {
     WORKFLOW:
 
     1. INITIAL BOOTSTRAP:
-       Run 'terraform init' and 'terraform apply'. 
+       Run 'terraform init' and 'terraform apply'.
        This will create the IAM roles, WIF, and the GCS Bucket.
 
     2. MIGRATE TO REMOTE STATE:
        After the first apply, uncomment the 'backend "gcs"' block in 'terraform.tf'.
        Fill in the 'bucket' name with: ${module.state_bucket.bucket_name}
-       Run 'terraform init' again to migrate the state.
-
-    3. GITHUB ACTIONS:
-       Use the following Workload Identity Provider in your CI/CD:
-       ${module.iam_wif.workload_identity_provider != null ? module.iam_wif.workload_identity_provider : "Not enabled"}
+       Run 'terraform init -migrate-state' to migrate local state to the cloud.
     EOT
+}
+
+output "github_actions_setup" {
+  description = "Commands to configure GitHub Actions variables using GitHub CLI (gh)"
+  value = var.enable_github_wif ? format(
+    "\n-----------------------------------------------------------\nGITHUB ACTIONS SETUP:\n\nCopy cicd_github_action.yaml to your Terraform projects and\nrun GitHub CLI (gh) commands in your target repositories:\n\ngh variable set GCP_PROJECT_ID --body \"%s\"\ngh variable set GCP_WIF_PROVIDER --body \"%s\"\ngh variable set GCP_WIF_SERVICE_ACCOUNT --body \"%s\"\n-----------------------------------------------------------\n",
+    var.project_id,
+    module.iam_wif.workload_identity_provider,
+    module.iam_wif.admin_service_account_email
+  ) : ""
 }
