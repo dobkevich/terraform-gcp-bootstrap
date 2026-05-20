@@ -11,8 +11,8 @@ terraform {
     }
   }
 
-  # AFTER the first 'terraform apply', uncomment this block
-  # and run 'terraform init' to migrate state to the cloud.
+  # AFTER the first 'terraform apply', uncomment this block and run
+  # 'terraform init -migrate-state' to migrate local state to the cloud.
 
   # backend "gcs" {
   #   bucket = "REPLACE_WITH_BUCKET_NAME_FROM_OUTPUT"
