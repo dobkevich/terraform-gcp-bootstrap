@@ -6,9 +6,12 @@ A production-ready Terraform "Seed" project that automates initialization of a n
 
 It configures base IAM/WIF and creates a bucket for remote Terraform state storage.
 
-Typical pipeline for 'terraform plan' and 'terraform apply' looks like this:
+A typical pipeline for 'terraform plan' and 'terraform apply' may look like this:
 ```text
-Terraform code -> GitHub (PR for terraform plan, merge for terraform apply) -> GitHub Actions CI/CD -> WIF -> GCP
+Terraform code -> GitHub -> GitHub Actions CI/CD -> WIF -> GCP
+
+PR -> terraform plan
+merge -> terraform apply
 ```
 
 ## Key Features
