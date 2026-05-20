@@ -15,6 +15,16 @@ output "admin_service_account_email" {
   value = module.iam_wif.admin_service_account_email
 }
 
+output "github_actions_setup" {
+  description = "Commands to configure GitHub Actions variables using GitHub CLI (gh)"
+  value       = var.enable_github_wif ? <<-EOT
+    # Run these commands in your target GitHub repository:
+    gh variable set GCP_PROJECT_ID --body "${var.project_id}"
+    gh variable set GCP_WIF_PROVIDER --body "${module.iam_wif.workload_identity_provider}"
+    gh variable set GCP_WIF_SERVICE_ACCOUNT --body "${module.iam_wif.admin_service_account_email}"
+  EOT : "GitHub WIF is not enabled. Set enable_github_wif = true to see setup commands."
+}
+
 output "instructions" {
   value = <<-EOT
     1. Human Admin (${var.admin_email}) has 'Editor', 'Project IAM Admin' and 'Billing Project Manager' roles.
