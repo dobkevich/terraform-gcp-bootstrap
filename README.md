@@ -10,7 +10,7 @@ A typical pipeline for 'terraform plan' and 'terraform apply' may look like this
 ```text
 Terraform code -> GitHub -> GitHub Actions CI/CD -> WIF -> GCP
 
-PR -> terraform plan
+pull request -> terraform plan
 merge -> terraform apply
 ```
 
