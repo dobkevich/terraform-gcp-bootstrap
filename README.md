@@ -1,7 +1,5 @@
 # GCP Project Bootstrap
 
-Bootstrap a new GCP project and prepare it for infrastructure configuration via Terraform using GitHub Actions CI/CD with WIF.
-
 A production-ready Terraform "Seed" project that automates initialization of a newly created Google Cloud Project and establishes the foundation needed to manage GCP infrastructure via CI/CD pipelines for Terraform using GitHub Actions with secure Workload Identity Federation (WIF) and multi-repo setup.
 
 It configures base IAM/WIF and creates a bucket for remote Terraform state storage.
