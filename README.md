@@ -30,7 +30,7 @@ merge -> terraform apply
 ├── variables.tf             # Global input variables
 ├── terraform.tf             # Provider configuration and Backend template
 ├── outputs.tf               # Deployment instructions and WIF details
-└── cicd_github_action.yaml  # Sample GitHub Action for your future projects
+└── cicd_github_actions.yaml # Sample GitHub Actions workflow for your future projects
 ```
 
 ## Prerequisites
@@ -81,7 +81,7 @@ Once the bucket is created, move your state file to the cloud:
 5.  Type `yes` when prompted.
 
 ### 4. Configure GitHub Actions
-In your GitHub repository, use the value from the `workload_identity_provider` output in your workflow files. Refer to `cicd_github_action.yaml` for the exact configuration.
+In your GitHub repository, use the value from the `workload_identity_provider` output in your workflow files. Refer to `cicd_github_actions.yaml` for the exact configuration.
 
 ## Security Compliance
 

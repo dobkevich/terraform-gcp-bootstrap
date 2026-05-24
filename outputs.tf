@@ -17,7 +17,7 @@ output "_01_instructions" {
 
     STAGE 3: CONFIGURE REMOTE STATE STORAGE FOR OTHER PROJECTS
        Use the same remote state backend code and the bucket name for all Terraform
-       projects used to manage infrastructure within a new GCP project, but change
+       projects used to manage infrastructure within this GCP project, but change
        the "prefix" value like this:
        prefix = "terraform/terraform-project-name/state"
     EOT
@@ -26,7 +26,7 @@ output "_01_instructions" {
 output "_02_instructions" {
   description = "Commands to configure GitHub Actions variables using GitHub CLI (gh)"
   value = var.enable_github_wif ? format(
-    "\nSTAGE 4: GITHUB ACTIONS SETUP\n   At this point, the GCP project is ready to be configured with Terraform\n   via CI/CD pipelines using GitHub Actions.\n   Copy the provided cicd_github_action.yaml into .github/workflows/ in your\n   Terraform repositories and run GitHub CLI (gh) commands in the target\n   repositories (or define these variables directly at github.com):\n\n   gh variable set GCP_PROJECT_ID --body \"%s\"\n   gh variable set GCP_WIF_PROVIDER --body \"%s\"\n   gh variable set GCP_WIF_SERVICE_ACCOUNT --body \"%s\"\n",
+    "\nSTAGE 4: GITHUB ACTIONS SETUP\n   At this point, the GCP project is ready to be configured with Terraform\n   via CI/CD pipelines using GitHub Actions.\n   Copy the provided cicd_github_actions.yaml into .github/workflows/ in your\n   Terraform repositories and run GitHub CLI (gh) commands in the target\n   repositories (or define these variables directly at github.com):\n\n   gh variable set GCP_PROJECT_ID --body \"%s\"\n   gh variable set GCP_WIF_PROVIDER --body \"%s\"\n   gh variable set GCP_WIF_SERVICE_ACCOUNT --body \"%s\"\n",
     var.project_id,
     module.iam_wif.workload_identity_provider,
     module.iam_wif.admin_service_account_email
