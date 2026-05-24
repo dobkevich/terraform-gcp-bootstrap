@@ -1,4 +1,4 @@
-# Ready-to-use GitHub Action pipeline with WIF
+# Ready-to-use GitHub Actions workflow with WIF
 name: "Terraform Plan/Apply"
 
 on:
