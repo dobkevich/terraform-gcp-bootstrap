@@ -87,12 +87,12 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const output = `#### Terraform Format 🎨 \`Passed\`
+            const output = `#### Terraform Format ✨ \`Passed\`
             #### TFLint 🔍 \`Passed\`
             #### Security Scan (Checkov & tfsec) 🛡️ \`Passed\`
             #### Terraform Initialization ⚙️
             #### Terraform Validation 🤖
-            #### Terraform Plan 🚀
+            #### Terraform Plan 📋
             
             <details><summary>Show full Plan log</summary>
             
