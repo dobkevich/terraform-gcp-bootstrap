@@ -23,6 +23,9 @@ merge -> terraform apply
 ## Project Structure
 
 ```text
+├── .gitignore               # Standard Git ignore rules
+├── .terraform.lock.hcl      # Terraform provider lock file
+├── LICENSE                  # MIT License
 ├── modules/
 │   ├── iam-wif/             # IAM roles, Automation SA, and GitHub OIDC Federation
 │   └── state-bucket/        # Versioned GCS bucket for Terraform state
@@ -71,7 +74,7 @@ terraform apply
 ### 3. Migrate State to GCS
 Once the bucket is created, move your state file to the cloud:
 
-1.  Note the `tf_state_bucket` name from the Terraform output.
+1.  Note the bucket name from the `_01_instructions` Terraform output.
 2.  Open `terraform.tf` and uncomment the `backend "gcs"` block.
 3.  Replace `REPLACE_WITH_BUCKET_NAME_FROM_OUTPUT` with your actual bucket name.
 4.  Run the migration command:
@@ -81,7 +84,7 @@ Once the bucket is created, move your state file to the cloud:
 5.  Type `yes` when prompted.
 
 ### 4. Configure GitHub Actions
-In your GitHub repository, use the value from the `workload_identity_provider` output in your workflow files. Refer to `cicd_github_actions.yaml` for the exact configuration.
+Follow the steps in the `_02_instructions` output. It will provide the exact `gh` commands to set up the necessary variables in your GitHub repositories. Refer to `cicd_github_actions.yaml` for the workflow configuration.
 
 ## Security Compliance
 
