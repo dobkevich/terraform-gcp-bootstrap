@@ -16,7 +16,7 @@ terraform {
 
   # backend "gcs" {
   #   bucket = "REPLACE_WITH_BUCKET_NAME_FROM_OUTPUT"
-  #   prefix = "terraform/bootstrap/state"
+  #   prefix = "bootstrap"
   # }
 }
 

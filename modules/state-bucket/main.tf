@@ -1,6 +1,6 @@
 resource "google_storage_bucket" "tf_state" {
   project  = var.project_id
-  name     = "${var.project_id}-tfstate-${var.bucket_name_suffix}"
+  name     = "${var.project_id}-${var.state_bucket_suffix}"
   location = var.region
 
   # Prevent accidental deletion of the state bucket

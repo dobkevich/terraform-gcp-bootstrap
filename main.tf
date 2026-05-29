@@ -21,19 +21,19 @@ resource "google_project_service" "required_apis" {
 
 # Wait for APIs to propagate
 resource "time_sleep" "wait_for_apis" {
-  depends_on = [google_project_service.required_apis]
+  depends_on      = [google_project_service.required_apis]
   create_duration = "30s"
 }
 
 module "iam_wif" {
   source = "./modules/iam-wif"
 
-  project_id           = var.project_id
-  project_number       = data.google_project.current.number
-  admin_email          = var.admin_email
-  standard_user_email  = var.standard_user_email
-  github_repositories  = var.github_repositories
-  enable_wif           = var.enable_github_wif
+  project_id          = var.project_id
+  project_number      = data.google_project.current.number
+  admin_email         = var.admin_email
+  standard_user_email = var.standard_user_email
+  github_repositories = var.github_repositories
+  enable_wif          = var.enable_github_wif
 
   depends_on = [time_sleep.wait_for_apis]
 }
@@ -41,9 +41,9 @@ module "iam_wif" {
 module "state_bucket" {
   source = "./modules/state-bucket"
 
-  project_id         = var.project_id
-  region             = var.region
-  bucket_name_suffix = var.state_bucket_suffix
+  project_id          = var.project_id
+  region              = var.region
+  state_bucket_suffix = var.state_bucket_suffix
 
   depends_on = [time_sleep.wait_for_apis]
 }

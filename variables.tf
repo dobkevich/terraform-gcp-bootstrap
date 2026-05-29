@@ -38,7 +38,7 @@ variable "github_repositories" {
 }
 
 variable "state_bucket_suffix" {
-  description = "Suffix for the TF state bucket"
+  description = "States bucket name suffix (full name will be {project_id}-{suffix})"
   type        = string
-  default     = "bootstrap"
+  default     = "terraform-states"
 }
