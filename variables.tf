@@ -41,4 +41,9 @@ variable "state_bucket_suffix" {
   description = "States bucket name suffix (full name will be {project_id}-{suffix})"
   type        = string
   default     = "terraform-states"
+
+  validation {
+    condition     = can(regex("^[a-z0-9_-]+$", var.state_bucket_suffix))
+    error_message = "The state_bucket_suffix must contain only lowercase letters, numbers, hyphens, or underscores. Dots are not allowed."
+  }
 }
