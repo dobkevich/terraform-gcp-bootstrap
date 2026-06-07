@@ -18,6 +18,12 @@ variable "standard_user_email" {
   type        = string
 }
 
+variable "github_owners" {
+  description = "List of allowed GitHub owners (usernames or organizations)"
+  type        = list(string)
+  default     = ["owner"]
+}
+
 variable "github_repositories" {
   description = "List of GitHub repositories in 'owner/repo' format allowed to impersonate the SA"
   type        = list(string)

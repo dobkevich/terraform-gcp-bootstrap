@@ -1,0 +1,214 @@
+# Ready-to-use GitHub Actions workflow with WIF
+name: "Terraform Plan/Apply"
+
+on:
+  pull_request:
+    branches: [main, dev]
+  push:
+    branches: [main, dev]
+
+# Prevents simultaneous runs in the same environment
+concurrency:
+  group: terraform-${{ (github.ref == 'refs/heads/main' || github.base_ref == 'main') && 'prod' || 'dev' }}
+  cancel-in-progress: false
+
+permissions:
+  id-token: write         # Required for WIF
+  contents: read          # Required for checkout
+  pull-requests: write    # Required for posting PR comments
+
+env:
+  # Logic duplication is a GitHub Actions limitation for top-level context
+  ENVIRONMENT: ${{ (github.ref == 'refs/heads/main' || github.base_ref == 'main') && 'prod' || 'dev' }}
+  TF_IN_AUTOMATION: "true"
+
+jobs:
+  terraform:
+    name: "Terraform Automation"
+    runs-on: ubuntu-latest
+    # 'environment' context does not accept environment variables, so we
+    # can not reuse the previously defined ENVIRONMENT and duplicate the logic.
+    environment: ${{ (github.ref == 'refs/heads/main' || github.base_ref == 'main') && 'prod' || 'dev' }}
+
+    env:
+      WIF_PROVIDER: ${{ vars.GCP_WIF_PROVIDER }}
+      WIF_SERVICE_ACCOUNT: ${{ vars.GCP_WIF_SERVICE_ACCOUNT }}
+      GCP_PROJECT_ID: ${{ vars.GCP_PROJECT_ID }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6
+
+      # 1. Authentication & Setup
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v3
+        with:
+          workload_identity_provider: ${{ env.WIF_PROVIDER }}
+          service_account: ${{ env.WIF_SERVICE_ACCOUNT }}
+          project_id: ${{ env.GCP_PROJECT_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_wrapper: true
+
+      - name: Get Terraform version
+        id: tf-version
+        run: echo "version=$(terraform version -json | jq -r .terraform_version)" >> $GITHUB_OUTPUT
+
+      - name: Cache Terraform
+        uses: actions/cache@v5
+        with:
+          path: .terraform
+          key: ${{ runner.os }}-terraform-${{ steps.tf-version.outputs.version }}-${{ hashFiles('**/.terraform.lock.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-terraform-${{ steps.tf-version.outputs.version }}-
+
+      - name: Terraform Init
+        id: tf-init
+        run: terraform init -input=false -no-color -backend-config=environments/${{ env.ENVIRONMENT }}.tfbackend
+
+      # 2. Quality & Security Checks
+      - name: Terraform Format Check
+        id: fmt
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Setup TFLint
+        id: setup-tflint
+        uses: terraform-linters/setup-tflint@v6
+
+      - name: Get TFLint version
+        id: tflint-version
+        run: echo "version=$(tflint --version | cut -d ' ' -f 3)" >> $GITHUB_OUTPUT
+
+      - name: Cache TFLint
+        uses: actions/cache@v5
+        with:
+          path: ~/.tflint.d/plugins
+          key: ${{ runner.os }}-tflint-${{ steps.tflint-version.outputs.version }}-${{ hashFiles('.tflint.hcl') }}
+          restore-keys: |
+            ${{ runner.os }}-tflint-${{ steps.tflint-version.outputs.version }}-
+
+      - name: Init TFLint
+        run: tflint --init
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run TFLint
+        id: tflint
+        run: tflint -f compact
+
+      - name: Run Checkov
+        id: checkov
+        uses: bridgecrewio/checkov-action@v12
+        with:
+          directory: .
+          framework: terraform
+          soft_fail: true
+          output_format: cli
+
+      - name: Run Trivy vulnerability scanner
+        id: trivy
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          scan-type: 'config'
+          hide-progress: true
+          format: 'table'
+          exit-code: '0'
+          severity: 'CRITICAL,HIGH'
+
+      # 3. Plan
+      - name: Terraform Plan
+        id: plan
+        run: terraform plan -no-color -input=false -var-file=environments/${{ env.ENVIRONMENT }}.tfvars -out=tfplan -lock-timeout=300s
+        continue-on-error: true
+
+      # 4. Apply (only on push and only if plan was successful)
+      - name: Terraform Apply
+        id: apply
+        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev') && steps.plan.outcome == 'success'
+        run: terraform apply -input=false -no-color -lock-timeout=300s tfplan
+        continue-on-error: true
+
+      # 5. Reporting
+      - name: Reporting
+        if: always()
+        uses: actions/github-script@v9
+        env:
+          PLAN: "${{ steps.plan.outputs.stdout }}"
+          APPLY: "${{ steps.apply.outputs.stdout }}"
+          ENVIRONMENT: ${{ env.ENVIRONMENT }}
+        with:
+          script: |
+            const getIcon = (outcome) => {
+              if (outcome === 'success') return '✅';
+              if (outcome === 'failure') return '❌';
+              return '➖'; // If skipped or not run
+            };
+            
+            const truncate = (str) => (str && str.length > 60000) ? str.substring(0, 60000) + "\n... (truncated)" : (str || "");
+            
+            const planLog = truncate(process.env.PLAN);
+            const applyLog = truncate(process.env.APPLY);
+
+            let output = `#### Environment: \`${process.env.ENVIRONMENT}\`
+            #### Terraform Initialization \`${getIcon('${{ steps.tf-init.outcome }}')}\`
+            #### Terraform Format \`${getIcon('${{ steps.fmt.outcome }}')}\`
+            #### Terraform Validate \`${getIcon('${{ steps.validate.outcome }}')}\`
+            #### TFLint \`${getIcon('${{ steps.tflint.outcome }}')}\`
+            #### Security Scan (Checkov) \`${getIcon('${{ steps.checkov.outcome }}')}\`
+            #### Security Scan (Trivy) \`${getIcon('${{ steps.trivy.outcome }}')}\`
+            #### Terraform Plan \`${getIcon('${{ steps.plan.outcome }}')}\`
+            #### Terraform Apply \`${getIcon('${{ steps.apply.outcome }}')}\`
+
+            <details><summary> >>> Full plan log</summary>
+            
+            \`\`\`terraform
+            ${planLog}
+            \`\`\`
+            
+            </details>`;
+
+            if (applyLog) {
+              output += `
+            <details><summary> >>> Full apply log</summary>
+            
+            \`\`\`terraform
+            ${applyLog}
+            \`\`\`
+            
+            </details>`;
+            }
+
+            output += `\n\n*Event: \`${{ github.event_name }}\` by @${{ github.actor }}*`;
+
+            // Post to Job Summary
+            core.summary.addRaw(output).write();
+
+            // Post Plan to PR if event is pull_request
+            if (context.eventName === 'pull_request') {
+              github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: output
+              })
+            }
+
+      # 6. Final Status Check
+      - name: Check Statuses
+        if: always()
+        run: |
+          if [[ "${{ steps.plan.outcome }}" == "failure" ]]; then
+            echo "Terraform Plan failed."
+            exit 1
+          fi
+          if [[ "${{ steps.apply.outcome }}" == "failure" ]]; then
+            echo "Terraform Apply failed."
+            exit 1
+          fi

@@ -27,12 +27,13 @@ resource "google_iam_workload_identity_pool_provider" "github_provider" {
   # "assertion.repository" contains "owner/repo"
   attribute_mapping = {
     "google.subject"             = "assertion.sub"
+    "attribute.actor"            = "assertion.actor"
     "attribute.repository"       = "assertion.repository"
     "attribute.repository_owner" = "assertion.repository_owner"
   }
 
-  # Security best practice: restrict at the provider level
-  attribute_condition = "assertion.repository_owner != ''"
+  # Security best practice: restrict at the provider level to specific owners
+  attribute_condition = length(var.github_owners) > 0 ? format("assertion.repository_owner in [%s]", join(",", [for owner in var.github_owners : format("'%s'", owner)])) : "assertion.repository_owner != ''"
   
   oidc {
     issuer_uri = "https://token.actions.githubusercontent.com"
@@ -42,11 +43,11 @@ resource "google_iam_workload_identity_pool_provider" "github_provider" {
 }
 
 # 3. Allow your GitHub repository to impersonate the Project Admin SA.
-# This grants the tokenCreator role to the specific GitHub repo.
+# This grants the workloadIdentityUser role to the specified GitHub repo(s).
 resource "google_service_account_iam_member" "cicd_impersonation" {
   for_each           = var.enable_wif ? toset(var.github_repositories) : []
   service_account_id = google_service_account.project_admin_sa.name
-  role               = "roles/iam.serviceAccountTokenCreator"
+  role               = "roles/iam.workloadIdentityUser"
   
   # Best practice: use project NUMBER in the principalSet
   member = "principalSet://iam.googleapis.com/projects/${var.project_number}/locations/global/workloadIdentityPools/${local.pool_id}/attribute.repository/${each.value}"

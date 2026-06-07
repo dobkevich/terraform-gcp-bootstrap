@@ -32,8 +32,9 @@ module "iam_wif" {
   project_number      = data.google_project.current.number
   admin_email         = var.admin_email
   standard_user_email = var.standard_user_email
-  github_repositories = var.github_repositories
   enable_wif          = var.enable_github_wif
+  github_owners       = var.github_owners
+  github_repositories = var.github_repositories
 
   depends_on = [time_sleep.wait_for_apis]
 }

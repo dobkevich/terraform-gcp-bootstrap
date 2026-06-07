@@ -25,10 +25,22 @@ variable "standard_user_email" {
   type        = string
 }
 
+variable "environment_for_outputs" {
+  description = "Environment name to be used in outputs (in configuration samples)"
+  type        = string
+  default     = "prod"
+}
+
 variable "enable_github_wif" {
   description = "Whether to enable Workload Identity Federation"
   type        = bool
   default     = false
+}
+
+variable "github_owners" {
+  description = "List of allowed GitHub owners (usernames or organizations)"
+  type        = list(string)
+  default     = ["owner"]
 }
 
 variable "github_repositories" {

@@ -23,9 +23,6 @@ merge -> terraform apply
 ## Project Structure
 
 ```text
-├── .gitignore               # Standard Git ignore rules
-├── .terraform.lock.hcl      # Terraform provider lock file
-├── LICENSE                  # MIT License
 ├── modules/
 │   ├── iam-wif/             # IAM roles, Automation SA, and GitHub OIDC Federation
 │   └── state-bucket/        # Versioned GCS bucket for Terraform state
@@ -33,7 +30,10 @@ merge -> terraform apply
 ├── variables.tf             # Global input variables
 ├── terraform.tf             # Provider configuration and Backend template
 ├── outputs.tf               # Deployment instructions and WIF details
-└── cicd_github_actions.yaml # Sample GitHub Actions workflow for your future projects
+├── cicd_github_actions.yaml # Sample GitHub Actions workflow for your future projects
+├── .gitignore               # Standard Git ignore rules
+├── .terraform.lock.hcl      # Terraform provider lock file
+└── LICENSE                  # MIT License
 ```
 
 ## Prerequisites
@@ -48,20 +48,28 @@ merge -> terraform apply
 Create a `terraform.tfvars` file (this file is ignored by git):
 
 ```hcl
-project_id          = "your-google-cloud-project-id"
-region              = "europe-north2"
-zone                = "europe-north2-b"
-admin_email         = "your-email@example.com"
-standard_user_email = "team-member@example.com"
-enable_github_wif   = true
-github_repositories = [
-  "owner/your-infra-repo",
-  "owner/your-app-repo"
+project_id              = "GCP_PROJECT_ID"
+region                  = "europe-north2"
+zone                    = "europe-north2-b"
+admin_email             = "your-email@example.com"
+standard_user_email     = "team-member@example.com"
+environment_for_outputs = "prod"
+enable_github_wif       = true
+github_owners           = ["some-org", "some-user"]
+github_repositories     = [
+  "some-org/infra-repo",
+  "some-user/app-repo"
 ]
 ```
 
 If you do not plan to enable WIF for any GitHub repositories just set "enable_github_wif = false"
-and "github_repositories" will be ignored.
+and "github_owners" and "github_repositories" will be ignored.
+
+The 'environment_for_outputs' variable is used only in outputs.tf for configuration samples
+and does not affect any real infrastructure configuration. Default is "prod".
+When we bootstrap a new GCP project it is supposed to be used as an environment, like
+production, development, testing etc. This variable is used to provide relevant configuration
+commands and should contain an environment name (e.g., prod, dev, test).
 
 ### 2. Initial Bootstrap (Local State)
 The first run will create the foundational resources and store the state file locally.
@@ -83,13 +91,14 @@ Once the bucket is created, move your state file to the cloud:
     ```
 5.  Type `yes` when prompted.
 
-### 4. Configure GitHub Actions
-Follow the steps in the `_02_instructions` output. It will provide the exact `gh` commands to set up the necessary variables in your GitHub repositories. Refer to `cicd_github_actions.yaml` for the workflow configuration.
+### 4. Configure your Terraform projects.
+
+Follow the instructions in the output for configuring remote state storage and GitHub Actions workflow for your projects.
 
 ## Security Compliance
 
 - **Principle of Least Privilege**: While the automation SA starts with `Editor` for bootstrapping, it is scoped to prevent wide-scale organizational changes.
-- **OIDC Mapping**: Implements `attribute_condition` and mapping for `repository_owner` to prevent identity spoofing.
+- **OIDC Mapping**: Implements `attribute_condition` to restrict access by GitHub owners (organizations/users) and `attribute.repository` mapping for granular per-repo access control.
 - **State Protection**: GCS bucket uses `force_destroy = false` to prevent accidental deletion of infrastructure history.
 
 ## License
