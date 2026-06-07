@@ -17,6 +17,10 @@ crash.*.log
 *.tfvars
 *.tfvars.json
 
+# Allow environment-specific tfvars files as they contain project-level configurations
+# but no sensitive secrets. This is required for CI/CD environment switching.
+!environments/*.tfvars
+
 # Ignore override files as they are usually used to override resources locally and so
 # are not checked in
 override.tf
