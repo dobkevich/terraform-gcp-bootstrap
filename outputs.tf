@@ -29,7 +29,7 @@ output "_01_instructions" {
 output "_02_instructions" {
   description = "Commands to configure GitHub Actions variables using GitHub CLI (gh)"
   value = var.enable_github_wif ? format(
-    "\nSTAGE 4: GITHUB ACTIONS SETUP\n   Copy the provided cicd_github_actions.yaml into .github/workflows/ in your\n   Terraform repositories and run GitHub CLI (gh) commands inside every target\n   repository directory (or define these variables directly at github.com):\n\n   gh api -X PUT /repos/:owner/:repo/environments/%s\n   gh variable set GCP_PROJECT_ID --body \"%s\" --env %s\n   gh variable set GCP_WIF_PROVIDER --body \"%s\" --env %s\n   gh variable set GCP_WIF_SERVICE_ACCOUNT --body \"%s\" --env %s\n   gh variable list --env %s\n",
+    "\nSTAGE 4: GITHUB ACTIONS SETUP\n  Copy files from boilerplate/ directory to your Terraform repositories:\n      cicd_github_actions.yaml into .github/workflows/\n      .tflint.hcl into a repository root\n   and run GitHub CLI (gh) commands inside every target repository directory\n   (or define these variables directly at github.com):\n\n   gh api -X PUT /repos/:owner/:repo/environments/%s\n   gh variable set GCP_PROJECT_ID --body \"%s\" --env %s\n   gh variable set GCP_WIF_PROVIDER --body \"%s\" --env %s\n   gh variable set GCP_WIF_SERVICE_ACCOUNT --body \"%s\" --env %s\n   gh variable list --env %s\n",
     var.environment_for_outputs,
     var.project_id, var.environment_for_outputs,
     module.iam_wif.workload_identity_provider, var.environment_for_outputs,
