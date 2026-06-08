@@ -23,17 +23,18 @@ merge -> terraform apply
 ## Project Structure
 
 ```text
+├── boilerplate/                  # Ready-to-use files for your future projects
+│   ├── cicd_github_actions.yaml  # GitHub Actions CI/CD workflow for Terraform
+│   └── .tflint.hcl               # TFLint config with Google Cloud ruleset
 ├── modules/
-│   ├── iam-wif/             # IAM roles, Automation SA, and GitHub OIDC Federation
-│   └── state-bucket/        # Versioned GCS bucket for Terraform state
-├── main.tf                  # Root orchestrator with API enablement logic
-├── variables.tf             # Global input variables
-├── terraform.tf             # Provider configuration and Backend template
-├── outputs.tf               # Deployment instructions and WIF details
-├── cicd_github_actions.yaml # Sample GitHub Actions workflow for your future projects
-├── .gitignore               # Standard Git ignore rules
-├── .terraform.lock.hcl      # Terraform provider lock file
-└── LICENSE                  # MIT License
+│   ├── iam-wif/                  # IAM roles, Automation SA, and GitHub OIDC Federation
+│   └── state-bucket/             # Versioned GCS bucket for Terraform state
+├── main.tf                       # Root orchestrator with API enablement logic
+├── variables.tf                  # Global input variables
+├── terraform.tf                  # Provider and backend configuration
+├── outputs.tf                    # Deployment instructions and WIF details
+├── .gitignore                    # Standard Git ignore rules
+└── LICENSE                       # MIT License
 ```
 
 ## Prerequisites
