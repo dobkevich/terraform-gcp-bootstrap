@@ -81,6 +81,8 @@ jobs:
       - name: Setup TFLint
         id: setup-tflint
         uses: terraform-linters/setup-tflint@v6
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Get TFLint version
         id: tflint-version
