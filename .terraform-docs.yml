@@ -1,4 +1,4 @@
-formatter: "markdown table"
+formatter: "markdown document"
 
 recursive:
   enabled: true
@@ -9,6 +9,7 @@ header-from: main.tf
 
 settings:
   hide-empty: false
+  anchor: false
 
 output:
   file: README.md
