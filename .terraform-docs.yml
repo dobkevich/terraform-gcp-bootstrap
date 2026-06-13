@@ -1,0 +1,36 @@
+formatter: "markdown table"
+
+recursive:
+  enabled: true
+  path: modules
+  include-main: true
+
+header-from: main.tf
+
+settings:
+  hide-empty: false
+
+output:
+  file: README.md
+  method: inject
+  template: |-
+    <!-- BEGIN_TF_DOCS -->
+    {{ .Content }}
+    <!-- END_TF_DOCS -->
+
+content: |-
+  {{ .Header }}
+
+  {{ .Requirements }}
+
+  {{ .Providers }}
+
+  {{ .Modules }}
+
+  {{ .Resources }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
+
+  {{ .Footer }}

@@ -105,3 +105,61 @@ Follow the instructions in the output for configuring remote state storage and G
 ## License
 
 MIT
+
+<!-- BEGIN_TF_DOCS -->
+
+
+## Requirements
+
+| Name | Version |
+| ---- | ------- |
+| <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >= 1.0 |
+| <a name="requirement_google"></a> [google](#requirement\_google) | ~> 7.0 |
+| <a name="requirement_time"></a> [time](#requirement\_time) | ~> 0.14 |
+
+## Providers
+
+| Name | Version |
+| ---- | ------- |
+| <a name="provider_google"></a> [google](#provider\_google) | ~> 7.0 |
+| <a name="provider_time"></a> [time](#provider\_time) | ~> 0.14 |
+
+## Modules
+
+| Name | Source | Version |
+| ---- | ------ | ------- |
+| <a name="module_iam_wif"></a> [iam\_wif](#module\_iam\_wif) | ./modules/iam-wif | n/a |
+| <a name="module_state_bucket"></a> [state\_bucket](#module\_state\_bucket) | ./modules/state-bucket | n/a |
+
+## Resources
+
+| Name | Type |
+| ---- | ---- |
+| [google_project_service.required_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
+| [time_sleep.wait_for_apis](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
+| [google_project.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
+
+## Inputs
+
+| Name | Description | Type | Default | Required |
+| ---- | ----------- | ---- | ------- | :------: |
+| <a name="input_admin_email"></a> [admin\_email](#input\_admin\_email) | Email of the human administrator | `string` | n/a | yes |
+| <a name="input_enable_github_wif"></a> [enable\_github\_wif](#input\_enable\_github\_wif) | Whether to enable Workload Identity Federation | `bool` | `false` | no |
+| <a name="input_environment_for_outputs"></a> [environment\_for\_outputs](#input\_environment\_for\_outputs) | Environment name to be used in outputs (in configuration samples) | `string` | `"prod"` | no |
+| <a name="input_github_owners"></a> [github\_owners](#input\_github\_owners) | List of allowed GitHub owners (usernames or organizations) | `list(string)` | <pre>[<br/>  "owner"<br/>]</pre> | no |
+| <a name="input_github_repositories"></a> [github\_repositories](#input\_github\_repositories) | List of GitHub repositories in 'owner/repo' format | `list(string)` | <pre>[<br/>  "owner/repo"<br/>]</pre> | no |
+| <a name="input_project_id"></a> [project\_id](#input\_project\_id) | The GCP Project ID | `string` | n/a | yes |
+| <a name="input_region"></a> [region](#input\_region) | GCP Region for resources | `string` | `"europe-north2"` | no |
+| <a name="input_standard_user_email"></a> [standard\_user\_email](#input\_standard\_user\_email) | Email of a standard viewer user | `string` | n/a | yes |
+| <a name="input_state_bucket_suffix"></a> [state\_bucket\_suffix](#input\_state\_bucket\_suffix) | States bucket name suffix (full name will be {project\_id}-{suffix}) | `string` | `"terraform-states"` | no |
+| <a name="input_zone"></a> [zone](#input\_zone) | GCP Zone for resources | `string` | `"europe-north2-b"` | no |
+
+## Outputs
+
+| Name | Description |
+| ---- | ----------- |
+| <a name="output__01_instructions"></a> [\_01\_instructions](#output\_\_01\_instructions) | Steps to initialize a new GCP project and configure remote state storage |
+| <a name="output__02_instructions"></a> [\_02\_instructions](#output\_\_02\_instructions) | Commands to configure GitHub Actions variables using GitHub CLI (gh) |
+| <a name="output__03_instructions"></a> [\_03\_instructions](#output\_\_03\_instructions) | IAM and user setup details |
+
+<!-- END_TF_DOCS -->
