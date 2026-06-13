@@ -111,154 +111,55 @@ MIT
 
 ## Requirements
 
-The following requirements are needed by this module:
-
-- terraform (>= 1.0)
-
-- google (~> 7.0)
-
-- time (~> 0.14)
+| Name | Version |
+| ---- | ------- |
+| terraform | >= 1.0 |
+| google | ~> 7.0 |
+| time | ~> 0.14 |
 
 ## Providers
 
-The following providers are used by this module:
-
-- google (~> 7.0)
-
-- time (~> 0.14)
+| Name | Version |
+| ---- | ------- |
+| google | ~> 7.0 |
+| time | ~> 0.14 |
 
 ## Modules
 
-The following Modules are called:
-
-### iam\_wif
-
-Source: ./modules/iam-wif
-
-Version:
-
-### state\_bucket
-
-Source: ./modules/state-bucket
-
-Version:
+| Name | Source | Version |
+| ---- | ------ | ------- |
+| iam\_wif | ./modules/iam-wif | n/a |
+| state\_bucket | ./modules/state-bucket | n/a |
 
 ## Resources
 
-The following resources are used by this module:
+| Name | Type |
+| ---- | ---- |
+| [google_project_service.required_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) | resource |
+| [time_sleep.wait_for_apis](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) | resource |
+| [google_project.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) | data source |
 
-- [google_project_service.required_apis](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/project_service) (resource)
-- [time_sleep.wait_for_apis](https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/sleep) (resource)
-- [google_project.current](https://registry.terraform.io/providers/hashicorp/google/latest/docs/data-sources/project) (data source)
+## Inputs
 
-## Required Inputs
-
-The following input variables are required:
-
-### admin\_email
-
-Description: Email of the human administrator
-
-Type: `string`
-
-### project\_id
-
-Description: The GCP Project ID
-
-Type: `string`
-
-### standard\_user\_email
-
-Description: Email of a standard viewer user
-
-Type: `string`
-
-## Optional Inputs
-
-The following input variables are optional (have default values):
-
-### enable\_github\_wif
-
-Description: Whether to enable Workload Identity Federation
-
-Type: `bool`
-
-Default: `false`
-
-### environment\_for\_outputs
-
-Description: Environment name to be used in outputs (in configuration samples)
-
-Type: `string`
-
-Default: `"prod"`
-
-### github\_owners
-
-Description: List of allowed GitHub owners (usernames or organizations)
-
-Type: `list(string)`
-
-Default:
-
-```json
-[
-  "owner"
-]
-```
-
-### github\_repositories
-
-Description: List of GitHub repositories in 'owner/repo' format
-
-Type: `list(string)`
-
-Default:
-
-```json
-[
-  "owner/repo"
-]
-```
-
-### region
-
-Description: GCP Region for resources
-
-Type: `string`
-
-Default: `"europe-north2"`
-
-### state\_bucket\_suffix
-
-Description: States bucket name suffix (full name will be {project\_id}-{suffix})
-
-Type: `string`
-
-Default: `"terraform-states"`
-
-### zone
-
-Description: GCP Zone for resources
-
-Type: `string`
-
-Default: `"europe-north2-b"`
+| Name | Description | Type | Default | Required |
+| ---- | ----------- | ---- | ------- | :------: |
+| admin\_email | Email of the human administrator | `string` | n/a | yes |
+| enable\_github\_wif | Whether to enable Workload Identity Federation | `bool` | `false` | no |
+| environment\_for\_outputs | Environment name to be used in outputs (in configuration samples) | `string` | `"prod"` | no |
+| github\_owners | List of allowed GitHub owners (usernames or organizations) | `list(string)` | <pre>[<br/>  "owner"<br/>]</pre> | no |
+| github\_repositories | List of GitHub repositories in 'owner/repo' format | `list(string)` | <pre>[<br/>  "owner/repo"<br/>]</pre> | no |
+| project\_id | The GCP Project ID | `string` | n/a | yes |
+| region | GCP Region for resources | `string` | `"europe-north2"` | no |
+| standard\_user\_email | Email of a standard viewer user | `string` | n/a | yes |
+| state\_bucket\_suffix | States bucket name suffix (full name will be {project\_id}-{suffix}) | `string` | `"terraform-states"` | no |
+| zone | GCP Zone for resources | `string` | `"europe-north2-b"` | no |
 
 ## Outputs
 
-The following outputs are exported:
-
-### \_01\_instructions
-
-Description: Steps to initialize a new GCP project and configure remote state storage
-
-### \_02\_instructions
-
-Description: Commands to configure GitHub Actions variables using GitHub CLI (gh)
-
-### \_03\_instructions
-
-Description: IAM and user setup details
+| Name | Description |
+| ---- | ----------- |
+| \_01\_instructions | Steps to initialize a new GCP project and configure remote state storage |
+| \_02\_instructions | Commands to configure GitHub Actions variables using GitHub CLI (gh) |
+| \_03\_instructions | IAM and user setup details |
 
 <!-- END_TF_DOCS -->
