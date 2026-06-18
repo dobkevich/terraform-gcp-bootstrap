@@ -46,6 +46,13 @@ resource "google_project_iam_member" "sa_iam_admin_binding" {
   member  = "serviceAccount:${google_service_account.project_admin_sa.email}"
 }
 
+# Assign Service Networking Admin role to the Service Account (required for Private Service Access)
+resource "google_project_iam_member" "sa_service_networking_admin" {
+  project = var.project_id
+  role    = "roles/servicenetworking.networksAdmin"
+  member  = "serviceAccount:${google_service_account.project_admin_sa.email}"
+}
+
 
 # 3. Allow Human Admin to IMPERSONATE this Service Account
 resource "google_service_account_iam_member" "admin_impersonates_sa" {
