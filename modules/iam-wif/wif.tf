@@ -22,7 +22,7 @@ resource "google_iam_workload_identity_pool_provider" "github_provider" {
   workload_identity_pool_id          = local.pool_id
   workload_identity_pool_provider_id = "github-provider"
   display_name                       = "GitHub Actions Provider"
-  
+
   # Map GitHub JWT claims to GCP attributes
   # "assertion.repository" contains "owner/repo"
   attribute_mapping = {
@@ -34,7 +34,7 @@ resource "google_iam_workload_identity_pool_provider" "github_provider" {
 
   # Security best practice: restrict at the provider level to specific owners
   attribute_condition = length(var.github_owners) > 0 ? format("assertion.repository_owner in [%s]", join(",", [for owner in var.github_owners : format("'%s'", owner)])) : "assertion.repository_owner != ''"
-  
+
   oidc {
     issuer_uri = "https://token.actions.githubusercontent.com"
   }
@@ -48,7 +48,7 @@ resource "google_service_account_iam_member" "cicd_impersonation" {
   for_each           = var.enable_wif ? toset(var.github_repositories) : []
   service_account_id = google_service_account.project_admin_sa.name
   role               = "roles/iam.workloadIdentityUser"
-  
+
   # Best practice: use project NUMBER in the principalSet
   member = "principalSet://iam.googleapis.com/projects/${var.project_number}/locations/global/workloadIdentityPools/${local.pool_id}/attribute.repository/${each.value}"
 }

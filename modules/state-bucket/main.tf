@@ -20,7 +20,7 @@ resource "google_storage_bucket" "tf_state" {
       type = "Delete"
     }
     condition {
-      num_newer_versions = 5
+      num_newer_versions         = 5
       days_since_noncurrent_time = 90
     }
   }

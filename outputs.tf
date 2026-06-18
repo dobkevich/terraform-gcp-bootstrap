@@ -1,6 +1,6 @@
 output "_01_instructions" {
   description = "Steps to initialize a new GCP project and configure remote state storage"
-  value = <<-EOT
+  value       = <<-EOT
 
     A NEW GCP PROJECT INITIALIZATION AND NEXT STEPS
 
@@ -41,7 +41,7 @@ output "_02_instructions" {
 
 output "_03_instructions" {
   description = "IAM and user setup details"
-  value = <<-EOT
+  value       = <<-EOT
 
     IAM AND USER SETUP DETAILS
     
