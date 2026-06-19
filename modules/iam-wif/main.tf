@@ -1,30 +1,28 @@
 # What it does:
 #
-# 1. Human Admin Access
-# 2. Service Account for programmatic access (assigned Editor & IAM Admin roles)
+# 1. Human Admin roles
+# 2. Service Account for programmatic access and its roles
 # 3. Allow Human Admin to IMPERSONATE this Service Account
 # 4. Project-level Billing Management
 # 5. Standard User Access
 
 
-# 1. Human Admin Access
+# 1. Human Admin roles
 # Note: Using roles/editor instead of roles/owner for external users 
 # to comply with GCP Organization policies (ORG_MUST_INVITE_EXTERNAL_OWNERS).
-resource "google_project_iam_member" "human_admin" {
+resource "google_project_iam_member" "human_admin_roles" {
+  for_each = toset([
+    "roles/editor",
+    "roles/resourcemanager.projectIamAdmin", # IAM management
+    "roles/servicenetworking.networksAdmin"  # required for Private Service Access
+  ])
   project = var.project_id
-  role    = "roles/editor"
+  role    = each.key
   member  = "user:${var.admin_email}"
 }
 
-# Grant IAM management rights to the human admin
-resource "google_project_iam_member" "human_iam_admin" {
-  project = var.project_id
-  role    = "roles/resourcemanager.projectIamAdmin"
-  member  = "user:${var.admin_email}"
-}
 
-
-# 2. Service Account for programmatic access
+# 2. Service Account for programmatic access and its roles
 resource "google_service_account" "project_admin_sa" {
   project      = var.project_id
   account_id   = "project-admin-sa"
@@ -32,24 +30,14 @@ resource "google_service_account" "project_admin_sa" {
   description  = "SA with Editor and IAM Admin permissions for automation/CLI"
 }
 
-# Assign Editor role to the Service Account
-resource "google_project_iam_member" "sa_editor_binding" {
+resource "google_project_iam_member" "sa_roles" {
+  for_each = toset([
+    "roles/editor",
+    "roles/resourcemanager.projectIamAdmin", # IAM management
+    "roles/servicenetworking.networksAdmin"  # required for Private Service Access
+  ])
   project = var.project_id
-  role    = "roles/editor"
-  member  = "serviceAccount:${google_service_account.project_admin_sa.email}"
-}
-
-# Assign IAM Admin role to the Service Account (to manage permissions)
-resource "google_project_iam_member" "sa_iam_admin_binding" {
-  project = var.project_id
-  role    = "roles/resourcemanager.projectIamAdmin"
-  member  = "serviceAccount:${google_service_account.project_admin_sa.email}"
-}
-
-# Assign Service Networking Admin role to the Service Account (required for Private Service Access)
-resource "google_project_iam_member" "sa_service_networking_admin" {
-  project = var.project_id
-  role    = "roles/servicenetworking.networksAdmin"
+  role    = each.key
   member  = "serviceAccount:${google_service_account.project_admin_sa.email}"
 }
 

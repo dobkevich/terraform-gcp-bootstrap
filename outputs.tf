@@ -45,12 +45,13 @@ output "_03_instructions" {
 
     IAM AND USER SETUP DETAILS
     
-    1. Human Admin (${var.admin_email}) has the 'Editor', 'Project IAM Admin', and 'Billing Project Manager' roles.
+    1. Human Admin (${var.admin_email}) has the 'Editor', 'Project IAM Admin', 'Service Networking Admin',
+       and 'Billing Project Manager' roles.
 
     2. Standard User (${var.standard_user_email}) has the 'Viewer' role.
 
     3. Service Account '${module.iam_wif.admin_service_account_email}'
-       has the 'Editor', 'Project IAM Admin', and 'Workload Identity User' roles.
+       has the 'Editor', 'Project IAM Admin', 'Service Networking Admin', and 'Workload Identity User' roles.
 
     4. To use a service account, use impersonation instead of JSON keys (they are less secure and may be disabled).
 
